@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import kr.or.ddit.vo.AlbasengVO;
 
-@WebServlet("/albamon")
+@WebServlet(value="/albamon", loadOnStartup=1)
 public class SimpleFormProcessServlet_SEM extends HttpServlet {
 	public static Map<String, String> gradeMap;
 	public static Map<String, String> licenseMap;
@@ -56,8 +56,6 @@ public class SimpleFormProcessServlet_SEM extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
 		req.setCharacterEncoding("utf-8");
-		//resp.setContentType("text/html;charset=UTF-8");
-		
 	/*		
  		1)하드코딩
 	*/
@@ -82,16 +80,20 @@ public class SimpleFormProcessServlet_SEM extends HttpServlet {
 		vo.setLicense(license);
 		vo.setCareer(career);
 		boolean valid = true;
+		
 		Map<String,String> errors = new LinkedHashMap<>();
 		req.setAttribute("errors", errors);
 		if(StringUtils.isBlank(vo.getName())) {
 			valid = false;
+			errors.put("name", "이름 누락");
 		}
 		if(StringUtils.isBlank(vo.getTel())) {
 			valid = false;
+			errors.put("tel", "연락처 누락");
 		}
 		if(StringUtils.isBlank(vo.getAddress())) {
 			valid = false;
+			errors.put("address", "주소 누락");
 		}
 		boolean redirect = false;
 		String goPage = null;

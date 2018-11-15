@@ -1,24 +1,34 @@
+<%@page import="java.util.LinkedHashMap"%>
+<%@page import="kr.or.ddit.vo.AlbasengVO"%>
+<%@page import="java.util.Map"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.Objects"%>
 <%@page import="java.util.Map.Entry"%>
-<%@page import="kr.or.ddit.web.SimpleFormProcessServlet"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%
-String name =  request.getParameter("name");
-String age =  request.getParameter("age");
-String tel =  request.getParameter("tel");
-String addr =  request.getParameter("address");
-String gender =  request.getParameter("gender");
-String grade =  request.getParameter("grade");
-String career =  request.getParameter("career");
-String[] license = request.getParameterValues("license");
+// Map<String,String> gradeMap = (Map<String,String>)application.getAttribute("gradeMap");
+// Map<String,String> licenseMap = (Map<String,String>)application.getAttribute("licenseMap");
+// AlbasengVO albaVO = (AlbasengVO) request.getAttribute("albaVO");
+// Map<String,String> errors = (Map<String,String>) request.getAttribute("errors");
+// if(albaVO==null) albaVO = new AlbasengVO();
+// if(errors==null) errors = new LinkedHashMap<>();
 %>    
+<jsp:useBean id="gradeMap" class="java.util.HashMap" scope="application"></jsp:useBean>
+<jsp:useBean id="licenseMap" class="java.util.LinkedHashMap" scope="application"></jsp:useBean>
+<jsp:useBean id="albaVO" class="kr.or.ddit.vo.AlbasengVO" scope="request"></jsp:useBean>
+<jsp:useBean id="errors" class="java.util.LinkedHashMap" scope="request"></jsp:useBean>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style type="text/css">
+	.error{
+		color: red;
+	}
+</style>
 </head>
 <body>
 <!-- 알바몬에서 알바생의 프로필을 입력받으려고 함. -->
@@ -27,9 +37,12 @@ String[] license = request.getParameterValues("license");
 		<tr>
 			<th>이름</th>
 			<td>
-				<input type="text" name="name" value="<%=Objects.toString(name, "") %>" 
-					
+				<input type="text" name="name" 
+				value="<%=Objects.toString(albaVO.getName(), "") %>" 
 				/>
+				<span class="error">
+					<%=Objects.toString(errors.get("name"), "") %>
+				</span>
 			</td>
 		</tr>
 		
@@ -37,7 +50,7 @@ String[] license = request.getParameterValues("license");
 			<th>나이</th>
 			<td>
 				<input type="number" name="age" min="15" max="40"
-					value="<%=Objects.toString(age, "") %>"
+					value="<%=Objects.toString(albaVO.getAge(), "") %>"
 				/>
 			</td>
 		</tr>
@@ -48,8 +61,11 @@ String[] license = request.getParameterValues("license");
 				<input type="tel" name="tel" placeholder="000-0000-0000" 
 					pattern="\d[3}-[0-9]{3,4}-\d{4}"
 					required="required"
-					value="<%=Objects.toString(tel, "") %>"
+					value="<%=Objects.toString(albaVO.getTel(), "") %>"
 					/>
+				<span class="error">
+					<%=Objects.toString(errors.get("tel"), "") %>
+				</span>	
 			</td>
 		</tr>
 		
@@ -58,8 +74,11 @@ String[] license = request.getParameterValues("license");
 			<td>
 				<input type="text" name="address"
 					required="required"
-					value="<%=Objects.toString(addr, "") %>"
+					value="<%=Objects.toString(albaVO.getAddress(), "") %>"
 				/>
+				<span class="error">
+					<%=Objects.toString(errors.get("address"), "") %>
+				</span>
 			</td>
 		</tr>
 		
@@ -67,10 +86,10 @@ String[] license = request.getParameterValues("license");
 			<th>성별</th>
 			<td>
 				<label><input type="radio" name="gender" value="M"
-							<%="M".equals(gender)?"checked":"" %>
+							<%="M".equals(albaVO.getGender())?"checked":"" %>
 						/>남</label>
 				<label><input type="radio" name="gender" value="F"
-							<%="F".equals(gender)?"checked":"" %>
+							<%="F".equals(albaVO.getGender())?"checked":"" %>
 						/>여</label>
 			</td>
 		</tr>
@@ -82,9 +101,10 @@ String[] license = request.getParameterValues("license");
 					<option value="">학력</option>
 					<%
 						String pattern = "<option value='%s' %s>%s</option>";
-						for(Entry<String,String> entry : SimpleFormProcessServlet.gradeMap.entrySet()){
+						for(Object obj : gradeMap.entrySet()){
+							Entry entry = (Entry)obj;
 							String selected = "";
-							if(entry.getKey().equals(grade)){
+							if(entry.getKey().equals(albaVO.getGrade())){
 								selected = "selected";
 							}
 							out.println(String.format(pattern, entry.getKey(), selected ,entry.getValue()));
@@ -97,7 +117,7 @@ String[] license = request.getParameterValues("license");
 		<tr>
 			<th>경력</th>
 			<td>
-				<textarea name="career" rows="3" cols="100"><%=Objects.toString(career, "") %></textarea>
+				<textarea name="career" rows="3" cols="100"><%=Objects.toString(albaVO.getCareer(), "") %></textarea>
 			</td>
 		</tr>
 		
@@ -106,12 +126,13 @@ String[] license = request.getParameterValues("license");
 			<td>
 				<select name="license" multiple="multiple" size="10">
 					<%
-						if(license!=null){
-							Arrays.sort(license);
+						if(albaVO.getLicense()!=null){
+							Arrays.sort(albaVO.getLicense());
 						}
-						for(Entry<String,String> entry : SimpleFormProcessServlet.licenseMap.entrySet()){
+						for(Object obj : licenseMap.entrySet()){
+							Entry entry = (Entry)obj;
 							String selected = "";
-							if(license!=null && Arrays.binarySearch(license, entry.getKey()) >-1){
+							if(albaVO.getLicense()!=null && Arrays.binarySearch(albaVO.getLicense(), entry.getKey()) >-1){
 								selected = "selected";
 							}
 							out.println(String.format(pattern, entry.getKey(), selected,entry.getValue()));

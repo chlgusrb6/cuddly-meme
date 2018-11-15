@@ -18,14 +18,14 @@
 <head>
 <meta charset="UTF-8">
 <title>05/davichiForm.jsp</title>
-</head>
+
 <script type = "text/javascript">
 	function eventHandler() {
 		var form = document.forms[0];
 		form.submit();
 	}
 </script>
-
+</head>
 <body>
 	<form action="<%=request.getContextPath() %>/05/getDavichi.jsp">
 		<select name = "member" onchange="eventHandler()">
